@@ -1,18 +1,31 @@
 
-import os, bs4, csv 
-directory = os.listdir("/home/pi/projects/barrons/data/downs")
-for file in directory:
-    if file.endswith(".html"):
-        pull_barrons_infoFile = open(file)
+import os, bs4, csv
+
+DATADIR = "/home/pi/projects/barrons/data/downs"
+
+input_files_names = os.listdir(DATADIR)
+
+for file_name in input_files_names:
+    if file_name.endswith(".html"):
+        file = (os.path.join(DATADIR, file_name))
+        pull_barrons_infoFile = open(file, 'r')
         pull_barrons_infoContent = pull_barrons_infoFile.read()
         pull_barrons_infoSoup = bs4.BeautifulSoup(pull_barrons_infoContent, "html.parser")
         th = pull_barrons_infoSoup.select('html #search-profile #page-wrapper div#content-wrapper div#searchleftcol div.searchcontent table.tbl-profile tbody.basic-info tr th')
+        print(th)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
     # Put the names into a spreadsheet.
 #Take the names from the output, separate them by commas(somehow?) plave them in a spreadsheet. 
-        #td = pull_barrons_infoSoup.select('html #search-profile #page-wrapper #content-wrapper #searchleftcol div table tbody.basic-info tr td')
+        td = pull_barrons_infoSoup.select('html #search-profile #page-wrapper #content-wrapper #searchleftcol div table tbody.basic-info tr td')
+        reader = csv.reader(file)
+        allRows = [row for row in reader]
+        try: 
+            competitivenes = td[-1]
+        except IndexError:
+            print(td)
         #print(td)
-        print(th)
+        print(competitivenes)
+        #print(len(competitivenes))
 #print(dir(pull_barrons_infoFile))
 ##pull_barrons_infoContent = pull_barrons_infoFile.read()
 #print(pull_barrons_infoContent) #Prints Everything 
