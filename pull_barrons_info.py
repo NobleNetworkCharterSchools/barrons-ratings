@@ -1,12 +1,17 @@
 
 import os, bs4, csv, itertools  
 
-DATADIR = "/home/pi/projects/barrons/data/downs"
+DATADIR = "/home/pi/projects/barrons/data/downs_full"
 
 input_files_names = os.listdir(DATADIR)
+csvFile = open('college.csv', 'w', newline='')
+csvWriter = csv.writer(csvFile)#, delimiter='\t', lineterminator='\n\n')
+csvWriter.writerow(['College Name', 'Selectivity', 'file_name'])
+print("starting")
 
 for file_name in input_files_names:
     if file_name.endswith(".html"):
+        print(".", end="", flush=True)
         file = (os.path.join(DATADIR, file_name))
         pull_barrons_infoFile = open(file, 'r')
         pull_barrons_infoContent = pull_barrons_infoFile.read()
@@ -14,11 +19,14 @@ for file_name in input_files_names:
         th_elements = pull_barrons_infoSoup.select('html #search-profile #page-wrapper div#content-wrapper div#searchleftcol div.searchcontent table.tbl-profile tbody.basic-info tr th')
         #print(th_elements)
         try:
-            school_name = th_elements[0]
-            print("school_name: " , school_name.text, type(school_name.text), *school_name, type(*school_name))
+            school_name = th_elements[0].text
+            #print("school_name: " , school_name)
+            #print(file_name)
         except IndexError:
+            continue
             print(file_name)
             #print(school_name)
+            school_name = None
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
     # Put the names into a spreadsheet.
 #Take the names from the output, separate them by commas(somehow?) plave them in a spreadsheet. 
@@ -28,12 +36,14 @@ for file_name in input_files_names:
         allRows = [row for row in reader]
         try:
 #Takes the last object in the td list and prints it 
-            competitivenes = td_elements[-1]
-            print("Selectivity: " , *competitivenes)
+            competitivenes = td_elements[-1].text
+            #print("Selectivity: " , competitivenes)
         except IndexError:
 #if there is no values for td in the file then the code prints "unknown value"
-            print("Unknown Value")
-csvFile = open('college.csv', 'w', newline='')
-csvWriter = csv.writer(csvFile)#, delimiter='\t', lineterminator='\n\n')
-csvWriter.writerow(['College Name', 'Selectivity'])
+            print("Not Available")
+            competitivenes = None
+        
+    
+        csvWriter.writerow([school_name, competitivenes, file_name])
+print("Finished")
 csvFile.close()
