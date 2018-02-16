@@ -17,15 +17,13 @@ for file_name in input_files_names:
         pull_barrons_infoContent = pull_barrons_infoFile.read()
         pull_barrons_infoSoup = bs4.BeautifulSoup(pull_barrons_infoContent, "html.parser") 
         th_elements = pull_barrons_infoSoup.select('html #search-profile #page-wrapper div#content-wrapper div#searchleftcol div.searchcontent table.tbl-profile tbody.basic-info tr th')
-        #print(th_elements)
         try:
-            school_name = th_elements[0].text
-            #print("school_name: " , school_name)
-            #print(file_name)
+            school_name = th_elements[-1].text
+            #For a handfull of files, a semicolon is not present in the html file, but gets inserted. 
+            school_name = school_name.replace(";", "") 
         except IndexError:
             continue
             print(file_name)
-            #print(school_name)
             school_name = None
 #---------------------------------------------------------------------------------------------------------------------------------------------------------
     # Put the names into a spreadsheet.
@@ -37,13 +35,12 @@ for file_name in input_files_names:
         try:
 #Takes the last object in the td list and prints it 
             competitivenes = td_elements[-1].text
-            #print("Selectivity: " , competitivenes)
+    
         except IndexError:
 #if there is no values for td in the file then the code prints "unknown value"
             print("Not Available")
-            competitivenes = None
+            competitivenes = None 
         
-    
         csvWriter.writerow([school_name, competitivenes, file_name])
 print("Finished")
 csvFile.close()
