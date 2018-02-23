@@ -38,12 +38,12 @@ for file_name in input_files_names:
             competitivenes = None 
 
         if competitivenes == " ": 
-            competitivenes = "Was Empty"
+            competitivenes = "Not Available"
     
         #Some files only had an ACT as final list object. No other competitivesnes rating available.
         elif competitivenes.startswith("ACT:"):
             competitivenes = "Not Available"
-        #print(school_name, "'"+competitivenes+"'", file_name)
         csvWriter.writerow([school_name, competitivenes, file_name])
 print("Finished")
+
 csvFile.close()
