@@ -23,26 +23,27 @@ for file_name in input_files_names:
             school_name = school_name.replace(";", "")
         except IndexError:
             continue
-            print(file_name)
-            school_name = None
-#---------------------------------------------------------------------------------------------------------------------------------------------------------
-    # Put the names into a spreadsheet.
-#Take the names from the output, separate them by commas(somehow?) place them in a spreadsheet. 
+
+        # Put the names into a spreadsheet.
+        #Take the names from the output, separate them by commas(somehow?) place them in a spreadsheet. 
         td_elements = pull_barrons_infoSoup.select('html #search-profile #page-wrapper #content-wrapper #searchleftcol div table tbody.basic-info tr td')
-        reader = csv.reader(file)
-#takes the data in td and forms a list with it 
-        allRows = [row for row in reader]
+        
         try:
-#Takes the last object in the td list and prints it 
+            #Takes the last object in the td list and prints it 
             competitivenes = td_elements[-1].text
     
         except IndexError:
-#if there is no values for td in the file then the code prints "unknown value"
+            #if there is no values for td in the file then the code prints "unknown value"
             print("Not Available")
-            competitivenes = None
+            competitivenes = None 
+
+        if competitivenes == " ": 
+            competitivenes = "Was Empty"
+    
         #Some files only had an ACT as final list object. No other competitivesnes rating available.
-        if competitivenes.startswith("ACT:"):
+        elif competitivenes.startswith("ACT:"):
             competitivenes = "Not Available"
+        #print(school_name, "'"+competitivenes+"'", file_name)
         csvWriter.writerow([school_name, competitivenes, file_name])
 print("Finished")
 csvFile.close()
