@@ -2,7 +2,7 @@
 import os, bs4, csv, itertools  
 
 DATADIR = "/home/pi/projects/barrons/data/downs_full"
-
+DEFAULT_NO_COMP = "Not Available"
 input_files_names = os.listdir(DATADIR)
 csvFile = open('college.csv', 'w', newline='')
 csvWriter = csv.writer(csvFile)
@@ -38,11 +38,11 @@ for file_name in input_files_names:
             competitivenes = None 
 
         if competitivenes == " ": 
-            competitivenes = "Not Available"
+            competitivenes = DEFAULT_NO_COMP
     
         #Some files only had an ACT as final list object. No other competitivesnes rating available.
         elif competitivenes.startswith("ACT:"):
-            competitivenes = "Not Available"
+            competitivenes = DEFAULT_NO_COMP
         csvWriter.writerow([school_name, competitivenes, file_name])
 print("Finished")
 
