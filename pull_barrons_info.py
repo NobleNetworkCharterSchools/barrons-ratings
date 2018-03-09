@@ -11,20 +11,27 @@ DATADIR = "/home/pi/projects/barrons/data/downs_full"
 DEFAULT_NO_COMP = "Not Available"
 
 
-def scrape_files(): 
+def scrape_files():
+    
+    """
+        Scrapes each html file for college name and competitivenes rating. 
+    """
+    csvWriter = create_csvWriter()
     input_files_names = os.listdir(DATADIR)
-    csvFile = open('college.csv', 'w', newline='')
-    csvWriter = csv.writer(csvFile)
-    csvWriter.writerow(['College Name', 'Selectivity', 'file_name'])
-    print("starting")
-
     for file_name in input_files_names:
         if file_name.endswith(".html"):
             print(".", end="", flush=True)
+            
+            
+            ###Opens the files, and creates the Soup object.
             file = (os.path.join(DATADIR, file_name))
             pull_barrons_infoFile = open(file, 'r')
             pull_barrons_infoContent = pull_barrons_infoFile.read()
             pull_barrons_infoSoup = bs4.BeautifulSoup(pull_barrons_infoContent, "html.parser") 
+            ###
+            
+            
+            ###Finds and takes the College names from each of the files if present.
             th_elements = pull_barrons_infoSoup.select('html #search-profile #page-wrapper div#content-wrapper div#searchleftcol div.searchcontent table.tbl-profile tbody.basic-info tr th')
             try:
                 school_name = th_elements[-1].text
@@ -32,9 +39,10 @@ def scrape_files():
                 school_name = school_name.replace(";", "")
             except IndexError:
                 continue
-
-            # Put the names into a spreadsheet.
-            #Take the names from the output, separate them by commas(somehow?) place them in a spreadsheet. 
+            ###
+            
+            
+            ###Finds an takes the competitiveness of each of the files if present. 
             td_elements = pull_barrons_infoSoup.select('html #search-profile #page-wrapper #content-wrapper #searchleftcol div table tbody.basic-info tr td')
             
             try:
@@ -45,18 +53,31 @@ def scrape_files():
                 #if there is no values for td in the file then the code prints "unknown value"
                 print("Not Available")
                 competitivenes = None 
-
+                #If none present, writes none available
             if competitivenes == " ": 
                 competitivenes = DEFAULT_NO_COMP
         
             #Some files only had an ACT as final list object. No other competitivesnes rating available.
             elif competitivenes.startswith("ACT:"):
                 competitivenes = DEFAULT_NO_COMP
+            ###
+                
+                ###Writes all the data to the rows.  
             csvWriter.writerow([school_name, competitivenes, file_name])
+                ###
     print("Finished")
 
     csvFile.close()
-
+def create_csvWriter():
+    """
+    Generates the spreadsheet, and writes the header row.     
+    """
+    csvFile = open('college.csv', 'w', newline='')
+    csvWriter = csv.writer(csvFile)
+    #Creates the rows on the spreadsheet in which the data will be writen in.
+    csvWriter.writerow(['College Name', 'Selectivity', 'file_name'])
+    print("starting")
+    return csvWriter
 
 if __name__ == "__main__":
     scrape_files()
