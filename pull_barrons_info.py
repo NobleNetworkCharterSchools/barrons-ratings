@@ -6,7 +6,6 @@ and then  writes that information to a spreadsheet.
 """
 
 import csv
-import itertools
 import os
 
 import bs4
@@ -59,27 +58,31 @@ def create_soup(file_name):
     return pull_barrons_infoSoup
 
 
-
 def college_names(soup):
     """
-        Takes the college name value
-        from the BeautifulSoup object.
+    Takes the college name value
+    from the BeautifulSoup object.
 
-        College name is found
-        as the last th element.
+    College name is found
+    as the last th element.
 
-        Parameters:
-        - soup - bs4.BeautifulSoup object.
+    Parameters:
+    - soup - bs4.BeautifulSoup object.
 
-        Return Type:
-        - String, school_name.
+    Return Type:
+    - String, school_name.
     """
 
-    th_elements = soup.select('html #search-profile #page-wrapper div#content-wrapper div#searchleftcol div.searchcontent table.tbl-profile tbody.basic-info tr th')
+    school_name_selector = (
+        'html #search-profile #page-wrapper '
+        'div#content-wrapper div#searchleftcol div.searchcontent '
+        'table.tbl-profile tbody.basic-info tr th')
+
+    th_elements = soup.select(school_name_selector)
     try:
         school_name = th_elements[-1].text
-        '''For a handfull of files, a semicolon is not
-           present in the html file, but gets inserted.'''
+        # For a handfull of files, a semicolon is not
+        # present in the html file, but gets inserted.
         school_name = school_name.replace(";", "")
     except IndexError:
         return None
@@ -89,38 +92,36 @@ def college_names(soup):
 
 def competitivenes(soup):
     """
-        Takes the selectivity rating
-        from the BeautifulSoup object.
+    Takes the selectivity rating
+    from the BeautifulSoup object.
 
-        Parameters:
-        - soup - bs4.BeautifulSoup object.
+    Parameters:
+    - soup - bs4.BeautifulSoup object.
 
-        Return Type:
-        - String object, competitivenes.
+    Return Type:
+    - String object, competitivenes.
 
     """
-    td_elements = soup.select('html #search-profile #page-wrapper #content-wrapper #searchleftcol div table tbody.basic-info tr td')
+    selectivity_selector = (
+        'html #search-profile #page-wrapper '
+        '#content-wrapper #searchleftcol div '
+        'table tbody.basic-info tr td')
+    td_elements = soup.select(selectivity_selector)
 
     try:
         competitivenes = td_elements[-1].text
 
     except IndexError:
-        '''
-        Some files do not have a
-        competitivenes rating
-        '''
+        # Some files do not have a competitivenes rating
         print("Not Available")
         competitivenes = None
     if competitivenes == " ":
         competitivenes = DEFAULT_NO_COMP
-
-    '''Some files only had an ACT as final list object.
-       No other competitivesnes rating available.'''
-
+    # Some files only had an ACT as final list object.
+    # No other competitivesnes rating available.
     elif competitivenes.startswith("ACT:"):
         competitivenes = DEFAULT_NO_COMP
     return competitivenes
-
 
 
 def create_csvWriter(csvFile):
@@ -143,4 +144,3 @@ def create_csvWriter(csvFile):
 
 if __name__ == "__main__":
     main()
-
