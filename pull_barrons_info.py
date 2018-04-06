@@ -17,7 +17,7 @@ DEFAULT_NO_COMP = "Not Available"
 def main():
     """
     Scrapes each html file for college
-    name and competitivenes rating.
+    name and competitiveness rating.
     """
     csvFile = open('college.csv', 'w', newline='')
     csvWriter = create_csvWriter(csvFile)
@@ -30,7 +30,7 @@ def main():
             name = college_names(soup)
             if name is None:
                 continue
-            selectivity = competitivenes(soup)
+            selectivity = competitiveness(soup)
 
         csvWriter.writerow([name, selectivity, file_name])
     print("Finished")
@@ -90,7 +90,7 @@ def college_names(soup):
     return school_name
 
 
-def competitivenes(soup):
+def competitiveness(soup):
     """
     Takes the selectivity rating
     from the BeautifulSoup object.
@@ -99,7 +99,7 @@ def competitivenes(soup):
     - soup - bs4.BeautifulSoup object.
 
     Return Type:
-    - String object, competitivenes.
+    - String object, competitiveness.
 
     """
     selectivity_selector = (
@@ -109,19 +109,19 @@ def competitivenes(soup):
     td_elements = soup.select(selectivity_selector)
 
     try:
-        competitivenes = td_elements[-1].text
+        competitiveness = td_elements[-1].text
 
     except IndexError:
-        # Some files do not have a competitivenes rating
+        # Some files do not have a competitiveness rating
         print("Not Available")
-        competitivenes = None
-    if competitivenes == " ":
-        competitivenes = DEFAULT_NO_COMP
+        competitiveness = None
+    if competitiveness == " ":
+        competitiveness = DEFAULT_NO_COMP
     # Some files only had an ACT as final list object.
     # No other competitivesnes rating available.
-    elif competitivenes.startswith("ACT:"):
-        competitivenes = DEFAULT_NO_COMP
-    return competitivenes
+    elif competitiveness.startswith("ACT:"):
+        competitiveness = DEFAULT_NO_COMP
+    return competitiveness
 
 
 def create_csvWriter(csvFile):
