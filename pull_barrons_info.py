@@ -5,7 +5,11 @@ takes the college name and selectivity of each college,
 and then  writes that information to a spreadsheet.
 """
 
-import os, bs4, csv, itertools
+import csv
+import itertools
+import os
+
+import bs4
 
 DATADIR = "/home/pi/projects/barrons/data/downs_full"
 DEFAULT_NO_COMP = "Not Available"
