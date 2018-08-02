@@ -1,7 +1,7 @@
 
 """
 The program takes a folder full of HTML files and
-takes the college name and selectivity of each college,
+takes the college name, location, and selectivity of each college,
 and then  writes that information to a spreadsheet.
 """
 
@@ -10,7 +10,7 @@ import os
 
 import bs4
 
-DATADIR = "/home/pi/projects/barrons/data/downs_full"
+DATADIR = "downs"
 DEFAULT_NO_COMP = "Not Available"
 
 
@@ -30,9 +30,10 @@ def main():
             name = college_names(soup)
             if name is None:
                 continue
+            city, state, zipcode = college_location(soup)
             selectivity = competitiveness(soup)
 
-        csvWriter.writerow([name, selectivity, file_name])
+        csvWriter.writerow([name, city, state, zipcode, selectivity, file_name])
     print("Finished")
     csvFile.close()
 
@@ -87,7 +88,47 @@ def college_names(soup):
     except IndexError:
         return None
 
-    return school_name
+    return school_name.strip()
+
+def college_location(soup):
+    """
+    Takes the college location
+    from the BeautifulSoup object.
+
+    Parameters:
+    - soup - bs4.BeautifulSoup object.
+
+    Return Type:
+    - Tuple of strings (city, state, zip)
+
+    """
+    location_selector = (
+        'html #search-profile #page-wrapper '
+        '#content-wrapper #searchleftcol div '
+        'table tbody.basic-info tr td')
+    td_elements = soup.select(location_selector)
+
+    try:
+        location = td_elements[0].text
+
+    except IndexError:
+        # Some files do not have a location
+        print("Not Available")
+        location = None
+    if location == " ":
+        location = None
+
+    # Now split the location to city, state, zip
+    if not location:
+        return ("N/A", "N/A", "N/A")
+
+    try:
+        city, statezip = location.strip().split(sep=",")
+        state, zipcode = statezip.strip().split(sep=" ")
+    except:
+        return ("N/A", "N/A", "N/A")
+
+    return (city, state, zipcode)
 
 
 def competitiveness(soup):
@@ -138,7 +179,12 @@ def create_csvWriter(csvFile):
 
     """
     csvWriter = csv.writer(csvFile)
-    csvWriter.writerow(['College Name', 'Selectivity', 'file_name'])
+    csvWriter.writerow(['College Name',
+                        'City',
+                        'State',
+                        'ZipCode',
+                        'Selectivity',
+                        'file_name'])
     return csvWriter
 
 
