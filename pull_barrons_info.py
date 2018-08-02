@@ -51,7 +51,7 @@ def create_soup(file_name):
     - bs4.BeautifulSoup object.
     """
     file = (os.path.join(DATADIR, file_name))
-    pull_barrons_infoFile = open(file, 'r')
+    pull_barrons_infoFile = open(file, 'r', encoding='latin-1')
     pull_barrons_infoContent = pull_barrons_infoFile.read()
     pull_barrons_infoSoup = bs4.BeautifulSoup(
         pull_barrons_infoContent, "html.parser"
@@ -124,9 +124,13 @@ def college_location(soup):
 
     try:
         city, statezip = location.strip().split(sep=",")
+    except:
+        return (location, "N/A", "N/A")
+
+    try:
         state, zipcode = statezip.strip().split(sep=" ")
     except:
-        return ("N/A", "N/A", "N/A")
+        return (city, statezip.strip(), "N/A")
 
     return (city, state, zipcode)
 
